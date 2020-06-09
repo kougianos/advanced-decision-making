@@ -30,22 +30,22 @@ while(True):
 
 	if(iterations==0):
 		iterations = input("Wrong input. Please select a positive integer: ")
-		
+
 	try:
 		iterations = int(iterations)
 		print(f"Iterations: {iterations}\n")
 		break
 	except:
-		iterations = input("Wrong input. Please select a positive integer: ")
+		iterations = input("Wrong input. Please select an integer: ")
 
 print("Calculating average score...", end='')
 
 # ################################################ #
-# GaussianNB implementation
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
+# LinearRegression implementation
+import pandas as pd  
+import numpy as np  
+from sklearn.model_selection import train_test_split 
+from sklearn.linear_model import LinearRegression
 import datetime
 
 begin_time = datetime.datetime.now()
@@ -158,30 +158,38 @@ for index_label, row_series in df.iterrows():
     elif row_series['romantic'] == 'yes':
         df.at[index_label , 'romantic'] = 1
 
-# Convert dataframe to numeric in order to be used with GaussianNB
 df = df.apply(pd.to_numeric)
 
 # Create inputs
-inputs = df.drop(selection, axis='columns')
+X = df.drop(selection, axis='columns')
 
 # Create target
-target = df[selection]
+y = df[selection]
 
-score = count = 0
 for i in range(iterations):
 
-	X_train, X_test, y_train, y_test = train_test_split(inputs,target,test_size=0.2)
+	#Split Data 80-20
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-	model = GaussianNB()
+	#train the algorithm
+	lnr = LinearRegression()  
+	lnr.fit(X_train, y_train) 
 
-	model.fit(X_train, y_train)
+	y_pred = lnr.predict(X_test)
 
-	count += 1
-	score += model.score(X_test,y_test)
-	
-	if count%100==0:
-		print(".", end='') 
+	# First round the values of predictions, the typecast them as ints
+	y_pred = y_pred.round()
+	y_pred = y_pred.astype(int)
 
+	#Compare the actual output values with the predicted values
+	df = pd.DataFrame({'Actual': y_test.to_numpy().flatten(), 'Predicted': y_pred.flatten()})
 
-print(f"\nThe average score for the attribute {selection} after {iterations} iterations is {score/count}")
+# No need to calculate average from each iteration as the Linear Regression algorithm makes the same predictions every time
+correct_predictions = total_counts = 0
+for index_label, row_series in df.iterrows():
+	if(row_series['Actual']==row_series['Predicted']):
+		correct_predictions += 1
+	total_counts += 1
+
+print(f"\nThe average score for the attribute {selection} after {iterations} iterations is {correct_predictions/total_counts}")
 print(f"Script completed successfully, time: {datetime.datetime.now() - begin_time}")

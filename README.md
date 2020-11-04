@@ -4,6 +4,10 @@ The algorithms which are introduced are: <br>
 * Tree based algorithms <br>
 * Conditional probability algorithms <br>
 
+#### Technologies Used:
+* Python3
+* Jupyter Notebook
+
 Dataset used: https://archive.ics.uci.edu/ml/datasets/Student+Performance <br>
 Algorithms implemented and applied on the above dataset: <br>
 * Gaussian Naive Bayes <br>
